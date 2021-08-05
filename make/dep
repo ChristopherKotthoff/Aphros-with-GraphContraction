@@ -1,0 +1,30 @@
+#!/usr/bin/awk -f
+
+{
+    if (NF != 2) {
+	printf("dep: wrong line '%s', expect 'file file'\n", $0)  | "cat >&2"
+	exit(1)
+    }
+    if (sub(/\.cpp$/, "", $1) ||
+	sub(/\.c$/, "", $1))
+	objs[$1]
+    adj[$1, ++n[$1]] = $2
+}
+END {
+    for (obj in objs)
+	dfs(obj)
+}
+
+function dfs(s,   q, i, j, k, seen, nxt, c) {
+    q[++j] = s
+    while (++i in q) {
+	seen[c = q[i]]
+	for (k = 1; (c, k) in adj; k++) {
+	    nxt = adj[c, k]
+	    if (!(nxt in seen)) {
+		q[++j] = nxt
+		print s, nxt | "sort | uniq"
+	    }
+	}
+    }
+}

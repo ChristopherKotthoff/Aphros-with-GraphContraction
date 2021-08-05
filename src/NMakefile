@@ -1,0 +1,41 @@
+.SUFFIXES:
+L = libaphros_static.lib
+CXX = cl
+CC = cl
+LINK = $(CXX)
+CXXFLAGS = /O2 /Zi /nologo
+CFLAGS = /O2 /Zi /nologo
+CXXFLAGS_STD = /std:c++14 /EHsc -DM_PI=3.141592653589793
+CC_RULE = $(CC) -c $(CFLAGS) /Fo$@
+CXX_RULE = $(CXX) -c $(CXXFLAGS) $(CXXFLAGS_STD) /I. $1 /Fo$@
+1 = \
+-D_ALIGNBYTES_=16 \
+-D_USE_AMGX_=0 \
+-D_USE_AVX_=0 \
+-D_USE_BACKEND_CUBISM_=0 \
+-D_USE_BACKEND_LOCAL_=1 \
+-D_USE_BACKEND_NATIVE_=1 \
+-D_USE_DIM1_=0 \
+-D_USE_DIM2_=1 \
+-D_USE_DIM3_=1 \
+-D_USE_DIM4_=0 \
+-D_USE_FPZIP_=0 \
+-D_USE_HDF_=0 \
+-D_USE_HYPRE_=0 \
+-D_USE_MPI_=0 \
+-D_USE_OPENMP_=1 \
+-D_USE_OVERLAP_=0 \
+
+all: $L main.exe explorer.exe
+O_MPI = util\subcomm_dummy.obj
+include ..\make\windows\dep.mk
+include ..\make\windows\obj.mk
+include ..\make\windows\rule.mk
+
+$L: $O $(O_MPI); link /lib /OUT:$@ $O $(O_MPI)
+main.exe: main.obj $L; $(LINK) $(LDFLAGS) main.obj $L /Fo$@
+explorer.exe: explorer.obj $L; $(LINK) $(LDFLAGS) explorer.obj $L /Fo$@
+
+util\gitgen.cpp: ..\make\windows\gitgen.cpp; copy ..\make\windows\gitgen.cpp $@
+explorer.inc: ..\make\windows\explorer.inc; copy ..\make\windows\explorer.inc $@
+clean:; -del $O $(O_MPI) .dir $L main.exe explorer.exe

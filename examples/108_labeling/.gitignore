@@ -1,0 +1,10 @@
+*.h5
+*.raw
+*.xmf
+*.vtk
+*.vts
+*.pvd
+*.log
+arg
+np
+out

@@ -1,0 +1,15 @@
+CMakeCache.txt
+CMakeFiles/
+*/Makefile
+cmake_install.cmake
+install_manifest.txt
+main
+*.vtk
+*.h5
+*.csv
+*.png
+stat.dat
+stat_summary
+testcase
+cmake*.o
+a.out

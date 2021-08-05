@@ -1,0 +1,23 @@
+*~
+*.bak
+*.swp
+*.swo
+*.swn
+*.a
+*.o
+lsf.*
+
+ap.mfer
+
+# CMake
+build*
+
+# CTest
+CTestTestfile.cmake
+Testing/
+DartConfiguration.tcl
+
+# Makefile_legacy
+.dir
+
+explorer.inc

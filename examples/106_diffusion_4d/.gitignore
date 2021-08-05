@@ -1,0 +1,6 @@
+*.csv
+*.o
+*.out
+*.raw
+*.xmf
+out.conf

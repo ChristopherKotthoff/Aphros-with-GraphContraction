@@ -1,0 +1,27 @@
+#!/bin/sh -eu
+
+log=run.log
+
+ev () {
+  echo "$@" | tee -a "$log"
+  eval "$@ 2>&1" >> "$log"
+}
+
+run () {
+  nx=$1
+  shift
+  dir=nx$(printf %03d $nx)
+  if [ -d "$dir" ] ; then
+    echo "skip existing $dir"
+    return
+  fi
+  ev "make nx=$nx "$@" cleanrun"
+  ev "mkdir -p $dir && rsync -a {gen,{s,sm}_*.vtk,std.conf,out,out.conf,stat.dat} $dir/"
+}
+
+run 32 bsx=32
+run 64 np=4
+run 128 np=16
+run 256 np=64
+run 512 bsx=64 np=64
+run 1024 bsx=64 np=256

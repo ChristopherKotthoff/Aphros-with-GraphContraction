@@ -1,0 +1,45 @@
+#!/usr/bin/env python3
+
+import os
+import aphros
+
+
+class Test(aphros.TestBase):
+    def __init__(self):
+        cases = ["util", "h5", "raw", "raw_seq", "meta"]
+        super().__init__(cases=cases)
+
+    def run(self, case):
+        if case == "util":
+            self.runcmd("./t.dump_util > out")
+            return ["out"]
+        elif case == "h5":
+            self.runcmd("ap.mpirun -n 2 ./t.dump_gen o.h5 --content norm")
+            self.runcmd("ap.mpirun -n 2 ./t.dump_gen o0.h5 --content zero")
+            self.runcmd("ap.mpirun -n 2 ./t.dump_gen o1.h5 --content one")
+            self.runcmd("ap.mpirun -n 2 ./t.dump_diff o0.h5 o.h5 > out")
+            self.runcmd("ap.mpirun -n 2 ./t.dump_diff o0.h5 o1.h5 >> out")
+            return ["out"]
+        elif case == "raw":
+            self.runcmd("ap.mpirun -n 2 ./t.dump_gen o.raw --content norm")
+            self.runcmd("ap.mpirun -n 2 ./t.dump_gen o0.raw --content zero")
+            self.runcmd("ap.mpirun -n 2 ./t.dump_gen o1.raw --content one")
+            self.runcmd("ap.mpirun -n 2 ./t.dump_diff o0.raw o.raw > out")
+            self.runcmd("ap.mpirun -n 2 ./t.dump_diff o0.raw o1.raw >> out")
+            return ["out"]
+        elif case == "raw_seq":
+            self.runcmd("./t.dump_gen o.raw --content norm")
+            self.runcmd("./t.dump_gen o0.raw --content zero")
+            self.runcmd("./t.dump_gen o1.raw --content one")
+            self.runcmd("./t.dump_diff o0.raw o.raw > out")
+            self.runcmd("./t.dump_diff o0.raw o1.raw >> out")
+            return ["out"]
+        elif case == "meta":
+            self.runcmd("./t.dump_meta --dim 1 out1.xmf")
+            self.runcmd("./t.dump_meta --dim 2 out2.xmf")
+            self.runcmd("./t.dump_meta --dim 3 out3.xmf")
+            self.runcmd("./t.dump_meta --dim 4 out4.xmf")
+            return ["out1.xmf", "out2.xmf", "out3.xmf", "out4.xmf"]
+
+
+Test().main()

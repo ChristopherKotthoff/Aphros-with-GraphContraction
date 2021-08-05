@@ -1,0 +1,3 @@
+#!/bin/sh -eu
+
+sed 's/.*\(: assertion\)/\1/g'

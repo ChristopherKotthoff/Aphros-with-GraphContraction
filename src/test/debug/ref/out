@@ -1,0 +1,15 @@
+
+TestRange
+./debug/isnan.h: assertion failed '!IsNan(u[i])'
+Nan field f at i=0
+
+TestMesh
+./debug/isnan.h: assertion failed '!IsNan(u[i])'
+Nan field f at x=(0.25,0.25,0.5)
+./debug/isnan.h: assertion failed '!IsNan(u[i])'
+test/debug/main.cpp:62 in TestMesh:  Nan field f at x=(0.25,0.25,0.5)
+test/debug/main.cpp: assertion failed '0'
+test/debug/main.cpp: assertion failed '0'
+message
+test/debug/main.cpp: assertion failed, expected equal 0='0' and 1='1'
+test/debug/main.cpp: assertion failed, expected equal a='a' and b='b'

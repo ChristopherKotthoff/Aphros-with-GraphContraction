@@ -1,0 +1,11 @@
+.SUFFIXES:
+.SUFFIXES: .cpp
+MPICXX = mpic++
+CXXFLAGS = -O2 -g
+LDFLAGS_HDF = `pkg-config --libs hdf5-openmpi`
+APHROSFLAGS = -I../.. -L$(APHROS_PREFIX)/lib -laphros_static $(LDFLAGS_HDF)
+O = dump_diff dump_gen dump_util
+all: $O
+.cpp:
+	$(MPICXX) $< $(CXXFLAGS) $(APHROSFLAGS) -D_USE_MPI_=1 -o $@
+clean:; -rm $O

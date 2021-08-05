@@ -1,0 +1,110 @@
+#!/usr/bin/env python3
+
+import shutil
+import os
+import numpy as np
+
+import aphros
+
+
+class Test(aphros.TestBase):
+    def __init__(self):
+        super().__init__()
+        self.parser.add_argument('--block',
+                                 '-b',
+                                 type=int,
+                                 default=32,
+                                 help="Block size")
+        self.parser.add_argument('--mesh',
+                                 '-m',
+                                 type=int,
+                                 default=32,
+                                 help="Mesh size")
+        self.parser.add_argument('--comm',
+                                 '-c',
+                                 default='cubismnc',
+                                 choices=['local', 'cubismnc', 'native'],
+                                 help="Communication backend")
+        self.parser.add_argument('--vofm',
+                                 action="store_true",
+                                 help="Use vofm advection")
+        self.parser.add_argument('--nproc',
+                                 '-n',
+                                 type=int,
+                                 default=1,
+                                 help="Number of processors")
+
+    def run(self):
+        args = self.args
+        m = [args.mesh, args.mesh, 1]
+        bs = [args.block, args.block, 1]
+        nproc = args.nproc
+
+        conf = "par.conf"
+        with open(conf, 'w') as f:
+            f.write("set string backend {}\n".format(args.comm))
+            if args.vofm:
+                f.write("set string advection_solver vofm\n")
+
+        with open("np", 'w') as f:
+            f.write(str(nproc))
+
+        self.runcmd("ap.create_base_conf")
+        self.runcmd("ap.create_a_conf")
+        self.runcmd("touch add.conf")
+        self.runcmd("ap.part " + ' '.join(map(str, m + bs + [nproc])) +
+                    " > mesh.conf")
+        self.runcmd("ap.run ap.mfer".format(nproc, conf))
+
+        return [
+            "p_0000.dat",
+            "partit_0000.csv",
+            "vf_0000.dat",
+            "vx_0000.dat",
+            "vy_0000.dat",
+            "vz_0000.dat",
+        ]
+
+    def check(self, outdir, refdir, output_files):
+        res = True
+        for f in output_files:
+
+            def cmpdat(fa, fb):
+                ua = aphros.ReadPlain(fa)
+                ub = aphros.ReadPlain(fb)
+                error = np.nanmax(abs(ua - ub))
+                return error
+
+            def cmpcsv(fa, fb):
+                ua = np.genfromtxt(fa, delimiter=',', skip_header=1)
+                ub = np.genfromtxt(fb, delimiter=',', skip_header=1)
+                error = np.nanmax(abs(ua - ub))
+                return error
+
+            out = os.path.join(outdir, f)
+            ref = os.path.join(refdir, f)
+            if os.path.splitext(ref)[1] == ".csv":
+                error = cmpcsv(out, ref)
+            else:
+                error = cmpdat(out, ref)
+            eps = 1e-10
+            if error > eps:
+                self.printlog("error exceeded for '{}', {:} >= {:}".format(
+                    out, error, eps))
+                res = False
+            else:
+                self.printlog("pass for '{}', {:} < {:}".format(f, error, eps))
+        return res
+
+    def plot(self, datadir, output_files):
+        exe = "plot.py"
+        assert os.path.isfile(exe), "{} not found".format(exe)
+        exerel = os.path.relpath(exe, datadir)
+        self.runcmd("cd '{}' && {}".format(datadir, exerel))
+
+    def clean(self, outdir, output_files):
+        self.runcmd("make -f $(ap.makesim) cleanall")
+        super().clean(outdir, output_files)
+
+
+Test().main()

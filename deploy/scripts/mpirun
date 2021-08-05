@@ -1,0 +1,37 @@
+#!/bin/sh
+
+set -eu
+
+: ${APHROS_MPIRUN=mpirun}
+
+if [ "$#" -lt "1" ] || [ "$1" = "-h" ] ; then
+    cat << EOF
+usage: `basename $0` [--silent] [-h] ARGS
+Reads the number of cores NP from file 'np' and executes
+  mpirun -n NP ARGS
+If file 'np' does not exist, executes
+  mpirun ARGS
+Prints the command to be executed to STDERR if --silent is not
+provided. The value of environment variables APHROS_MPIRUN if set is
+used instead of mpirun command.
+EOF
+    exit 1
+fi
+
+silent=0
+if [ "$1" = "--silent" ] ; then
+  silent=1
+  shift 1
+fi
+
+if [ -f 'np' ] ; then
+  c=$APHROS_MPIRUN' -n $(cat np) "$@"'
+else
+  c=$APHROS_MPIRUN' "$@"'
+fi
+
+if [ "$silent" = "0" ] ; then
+  eval echo "$c" >&2
+fi
+
+eval "$c"

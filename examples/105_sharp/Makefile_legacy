@@ -1,0 +1,11 @@
+.SUFFIXES:
+.SUFFIXES: .cpp
+CXX = mpicxx
+CXXFLAGS = -O2 -g
+APHROSFLAGS = -D_USE_MPI_=1 -I$(APHROS_PREFIX)/include/aphros -L$(APHROS_PREFIX)/lib -laphros_static
+all: main
+.cpp:; $(CXX) $(CXXFLAGS) -o $@ $< $(APHROSFLAGS)
+install: main
+	mkdir -p $(APHROS_PREFIX)/bin
+	cp main $(APHROS_PREFIX)/bin/ap.sharpen
+clean:; -rm  $0
