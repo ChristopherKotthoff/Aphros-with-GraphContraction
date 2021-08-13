@@ -1,9 +1,11 @@
 This is the forked version of Aphros from https://github.com/cselab/aphros containing the graph contraction algorithm that was developed by me (Christopher Kotthoff) for my bachelor's thesis. While the framework was written by the original contributors of Aphros, I have written the files in ./examples/108_labeling/ (except for parts of the main.cpp file). Especially the file distri_CCL.hpp is my contribution and contains the GC algorithm.
 
 To run the example, first, install Aphros as usual, following the description of this README file further below. Then, go into ./examples/108_labeling/ and call $ ./run.sh
+
 The run.sh file contains an example line on how to execute the labeling procedure on the ETHZ Euler-cluster.
 
 --new_recolor can either be 0 or 1. 0 will call the previous algorithm and 1 will call the new GC algorithm.
+
 --file_prefix can be any string and is prepended to a timings file that is created for that run.
 
 Should one need help installing or running, please write to ckotthof@student.ethz.ch to resolve the problem.
